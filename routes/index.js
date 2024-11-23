@@ -2,21 +2,39 @@ var express = require('express');
 var Task = require("../model/Tasks")
 var TaskSchema = require("../validators/TaskValidator")
 const Joi = require("joi")
+
 var router = express.Router();
+
+// Middleware for checking authentication
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+        return next();
+    }
+    res.status(401).send('Unauthorized: Please log in to manage tasks.');
+}
+
+// Retrieve session-based tasks
+function getUserTasks(req) {
+    return req.session.tasks || (req.session.tasks = []);
+}
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  if (Task.list().length == 0) {
+  if (getUserTasks(req).length == 0) {
   }
 
   let obj = Task.getElementById(req.query.tid);
-  res.render('new', { tasks: Task.list(), task: obj });
+  res.render('new', { tasks: getUserTasks(req), task: obj });
 });
 
-router.post("/tarefas", function (req, res){
+
+router.post("/tarefas", isAuthenticated, function (req, res){
+    const tasks = getUserTasks(req);
+
     const {error, value} = TaskSchema.validate(req.body);
     if (error) {
-      res.render('index', { tasks: Task.list(), erro: "Dados incompletos" });
+      res.render('index', { tasks: getUserTasks(req), erro: "Dados incompletos" });
       return;
     }
     
@@ -44,7 +62,7 @@ router.get("/tarefas/del/:id", function(req, res){
 })
 
 router.get("/tarefas/count", function (req,res){
-  const taskCount = Task.list().length;
+  const taskCount = getUserTasks(req).length;
   res.render('count', {totalTasks: taskCount});
 })
 

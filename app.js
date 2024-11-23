@@ -5,6 +5,15 @@ var cookieParser = require('cookie-parser');
 var indexRouter = require('./routes/index');
 
 var app = express();
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
+
+app.use(cookieParser());
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: true
+}));
 
 // view engine setup
 var mustacheExpress = require("mustache-express");
@@ -33,3 +42,6 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+var customRoutes = require('./routes/customRoutes');
+app.use('/', customRoutes);

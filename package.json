@@ -6,6 +6,7 @@
     "start": "nodemon -e mustache,js,html,css ./bin/www"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "cookie-parser": "~1.4.4",
     "express": "~4.16.1",
     "joi": "^17.6.0",
